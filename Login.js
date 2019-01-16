@@ -3,7 +3,11 @@ import {
     Text,
     View,
     Image,
-    ImageBackground
+    ImageBackground,
+    FlatList,
+    TouchableOpacity,
+    Dimensions,
+    Alert
 } from 'react-native';
 
 import base64 from 'react-native-base64';
@@ -16,10 +20,12 @@ import {
 
 class Logo extends React.Component {
     static navigationOptions = {
-        header: null
+        header: null,
     }
 
+
     componentDidMount() {
+
         var encode = base64.encode('a4fd5d5325454189ba2c3dec27f6fa8c:9c3e9e1ee9394015af9f5db874ccfca2');
 
         return fetch('https://accounts.spotify.com/api/token', {
@@ -60,24 +66,52 @@ class Login extends React.Component {
         super(props);
         this.state = {
             access_token: this.props.navigation.getParam('access_token'),
-            user_object: '',
+            albums: '',
+            next: '',
+            previous: '',
+            items: '',
+            orientation: '',
+            Columns: 3,
+            height: Dimensions.get('window').width / 3,
+            width: Dimensions.get('window').width / 3,
+        }
+    }
+
+    getOrientation = () => {
+        if( this.refs.rootView ) {
+            if( Dimensions.get('window').width < Dimensions.get('window').height ) {
+              this.setState({ orientation: 'portrait' });
+              this.setState({ Columns: 3 });
+              this.setState({ height: Dimensions.get('window').width / 3 });
+              this.setState({ width: Dimensions.get('window').width / 3 });
+            } else {
+              this.setState({ orientation: 'landscape' });
+              this.setState({ Columns: 3 });
+              this.setState({ height: Dimensions.get('window').width / 3 });
+              this.setState({ width: Dimensions.get('window').width / 3 });
+            }
         }
     }
 
     componentDidMount() {
-        return fetch('https://api.spotify.com/v1/me', {
+
+        this.getOrientation();
+        Dimensions.addEventListener( 'change', () => { this.getOrientation(); });
+
+        return fetch('https://api.spotify.com/v1/browse/new-releases', {
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${this.state.access_token}`,
                 }
             })
             .then((response) => response.json())
             .then((responseJson) => {
-                console.warn(responseJson);
-                // this.setState({
-                //     user_object: responseJson, 
-                // })
+                this.setState({
+                    albums: responseJson.albums, 
+                    next: responseJson.albums.next,
+                    previous: responseJson.albums.previous,
+                    items: responseJson.albums.items,
+                })
             })
             .catch((error) => {
                 console.warn(error);
@@ -85,15 +119,38 @@ class Login extends React.Component {
     }
 
     render() {
-        return ( 
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'white' }}>
-                    <ImageBackground source={require('./assets/login_background.png')} style={{ flex: 1, justifyContent: 'center', resizeMode: 'cover', width: '100%' }}>
-                        <Text>asasa</Text>
-                    </ImageBackground>
-              </View>
-            );
-        }
+        return (
+            <FlatList
+                ref = "rootView"
+                style = {{ flex: 1 }}
+                data={this.state.items}
+                renderItem={({item}) => 
+                    <View style={{ flexWrap: 'wrap' }}>
+                        <TouchableOpacity onPress={() => navigate('Album', {name: 'Jane'})}>
+                            <Image style={{ height: this.state.height, width: this.state.width, margin: 0 }} source={{uri: item.images[0].url}}/>
+                        </TouchableOpacity>
+                    </View>
+                }
+                numColumns = {this.state.Columns}
+                keyExtractor={item => item.items}
+            />
+        );
     }
+}
+
+class Album extends React.Component {
+  render() {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text style={{ fontSize: 30 }}>This is a modal!</Text>
+        <Button
+          
+          title="Dismiss"
+        />
+      </View>
+    );
+  }
+}
 
 const AppNavigator = createStackNavigator({
     Logo: {
