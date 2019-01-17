@@ -70,8 +70,8 @@ class Login extends React.Component {
             next: '',
             previous: '',
             items: '',
+            categories: '',
             orientation: '',
-            Columns: 3,
             height: Dimensions.get('window').width / 3,
             width: Dimensions.get('window').width / 3,
         }
@@ -81,12 +81,10 @@ class Login extends React.Component {
         if( this.refs.rootView ) {
             if( Dimensions.get('window').width < Dimensions.get('window').height ) {
               this.setState({ orientation: 'portrait' });
-              this.setState({ Columns: 3 });
               this.setState({ height: Dimensions.get('window').width / 3 });
               this.setState({ width: Dimensions.get('window').width / 3 });
             } else {
               this.setState({ orientation: 'landscape' });
-              this.setState({ Columns: 3 });
               this.setState({ height: Dimensions.get('window').width / 3 });
               this.setState({ width: Dimensions.get('window').width / 3 });
             }
@@ -116,24 +114,46 @@ class Login extends React.Component {
             .catch((error) => {
                 console.warn(error);
             });
+
+        return fetch('https://api.spotify.com/v1/browse/categories?limit=20', {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${this.state.access_token}`,
+                }
+            })
+            .then((response) => response.json())
+            .then((responseJson) => {
+                console.warn(responseJson);
+                this.setState({
+                    categories: responseJson.categories.items,
+                })
+            })
+            .catch((error) => {
+                console.warn(error);
+            });
     }
 
     render() {
         return (
-            <FlatList
-                ref = "rootView"
-                style = {{ flex: 1 }}
-                data={this.state.items}
-                renderItem={({item}) => 
-                    <View style={{ flexWrap: 'wrap' }}>
-                        <TouchableOpacity onPress={() => navigate('Album', {name: 'Jane'})}>
-                            <Image style={{ height: this.state.height, width: this.state.width, margin: 0 }} source={{uri: item.images[0].url}}/>
-                        </TouchableOpacity>
-                    </View>
-                }
-                numColumns = {this.state.Columns}
-                keyExtractor={item => item.items}
-            />
+            <View>
+                <Text style={{ textAlign: 'left', margin: 10, fontSize: 25 }}>Album dan Single Baru</Text>
+                <FlatList
+                    ref = 'rootView'
+                    horizontal={true}
+                    data={this.state.items}
+                    renderItem={({item}) => 
+                        <View style={{ flexWrap: 'wrap', margin: 10 }}>
+                            <TouchableOpacity onPress={() => this.props.navigation.navigate('Album', { id: '123' }) }>
+                                <Image style={{ height: this.state.height, width: this.state.width, margin: 0 }} source={{uri: item.images[0].url}}/>
+                                <Text style={{ textAlign: 'center', marginBottom: 15, marginTop: 5 }}>{item.artists[0].name}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    }
+                    keyExtractor={item => item.id}
+                />
+
+
+            </View>
         );
     }
 }
@@ -143,10 +163,6 @@ class Album extends React.Component {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <Text style={{ fontSize: 30 }}>This is a modal!</Text>
-        <Button
-          
-          title="Dismiss"
-        />
       </View>
     );
   }
@@ -158,6 +174,9 @@ const AppNavigator = createStackNavigator({
     },
     Login: {
         screen: Login,
+    },
+    Album: {
+        screen: Album,
     },
 }, {
     initialRouteName: 'Logo',
