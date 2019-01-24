@@ -66,10 +66,7 @@ class Login extends React.Component {
         super(props);
         this.state = {
             access_token: this.props.navigation.getParam('access_token'),
-            albums: '',
-            next: '',
-            previous: '',
-            items: '',
+            releases: '',
             categories: '',
             orientation: '',
             height: Dimensions.get('window').width / 3,
@@ -91,11 +88,7 @@ class Login extends React.Component {
         }
     }
 
-    componentDidMount() {
-
-        this.getOrientation();
-        Dimensions.addEventListener( 'change', () => { this.getOrientation(); });
-
+    releases() {
         return fetch('https://api.spotify.com/v1/browse/new-releases', {
                 method: 'GET',
                 headers: {
@@ -105,17 +98,16 @@ class Login extends React.Component {
             .then((response) => response.json())
             .then((responseJson) => {
                 this.setState({
-                    albums: responseJson.albums, 
-                    next: responseJson.albums.next,
-                    previous: responseJson.albums.previous,
-                    items: responseJson.albums.items,
+                    releases: responseJson.albums.items,
                 })
             })
             .catch((error) => {
                 console.warn(error);
             });
+    }
 
-        return fetch('https://api.spotify.com/v1/browse/categories?limit=20', {
+    categories() {
+        return fetch('https://api.spotify.com/v1/browse/categories?offset=0&limit=20', {
                 method: 'GET',
                 headers: {
                     Authorization: `Bearer ${this.state.access_token}`,
@@ -123,7 +115,6 @@ class Login extends React.Component {
             })
             .then((response) => response.json())
             .then((responseJson) => {
-                console.warn(responseJson);
                 this.setState({
                     categories: responseJson.categories.items,
                 })
@@ -133,6 +124,15 @@ class Login extends React.Component {
             });
     }
 
+    componentDidMount() {
+
+        this.getOrientation();
+        Dimensions.addEventListener( 'change', () => { this.getOrientation(); });
+
+        this.releases();
+        this.categories();
+    }
+
     render() {
         return (
             <View>
@@ -140,12 +140,28 @@ class Login extends React.Component {
                 <FlatList
                     ref = 'rootView'
                     horizontal={true}
-                    data={this.state.items}
+                    data={this.state.releases}
                     renderItem={({item}) => 
                         <View style={{ flexWrap: 'wrap', margin: 10 }}>
                             <TouchableOpacity onPress={() => this.props.navigation.navigate('Album', { id: '123' }) }>
                                 <Image style={{ height: this.state.height, width: this.state.width, margin: 0 }} source={{uri: item.images[0].url}}/>
                                 <Text style={{ textAlign: 'center', marginBottom: 15, marginTop: 5 }}>{item.artists[0].name}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    }
+                    keyExtractor={item => item.id}
+                />
+
+                <Text style={{ textAlign: 'left', margin: 10, fontSize: 25 }}>Album dan Single Baru</Text>
+                <FlatList
+                    ref = 'rootView'
+                    horizontal={true}
+                    data={this.state.categories}
+                    renderItem={({item}) => 
+                        <View style={{ flexWrap: 'wrap', margin: 10 }}>
+                            <TouchableOpacity onPress={() => this.props.navigation.navigate('Album', { id: '123' })} onPress={() => { Alert.alert('rowData.guid') }}>
+                                <Image style={{ height: this.state.height, width: this.state.width, margin: 0 }} source={{uri: item.icons.url}}/>
+                                <Text style={{ textAlign: 'center', marginBottom: 15, marginTop: 5 }}>{item.name}</Text>
                             </TouchableOpacity>
                         </View>
                     }
