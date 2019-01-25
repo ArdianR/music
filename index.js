@@ -4,7 +4,7 @@ import { createAppContainer, createStackNavigator, StackActions, NavigationActio
 import Authorize from './Authorize';
 
 // import Login from './Login';
-// import Token from './Token';
+import Token from './Token';
 
 import {name as appName} from './app.json';
 
