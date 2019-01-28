@@ -19,110 +19,67 @@ var client_id = 'a4fd5d5325454189ba2c3dec27f6fa8c';
 var client_secret = '9c3e9e1ee9394015af9f5db874ccfca2';
 var redirect_uri = 'music://spotify.development';
 
-class Authorize extends Component {
+export default class Authorize extends Component {
     constructor(props) {
         super(props);
         this.state = {
             url: `https://accounts.spotify.com/authorize?client_id=` + client_id + `&response_type=code&show_dialog=true&redirect_uri=` + redirect_uri + `&scope=user-read-private user-read-email&state=34fFs29kd09`,
-            code: '',
             auth: base64.encode(client_id+`:`+client_secret),
         };
     }
 
     componentDidMount() {
-      Linking.openURL(this.state.url).catch(err => console.warn(err));
-      Linking.addEventListener('url', ({url}) => this.setState({code: url.replace('music://spotify.development/?code=', '')}) );
+      Linking.openURL(this.state.url).catch(err => console.log(err));
+      Linking.addEventListener('url', ({url}) => this.setState({code: url.replace('music://spotify.development/?code=', '').replace('&state=34fFs29kd09', '')}) );
+      console.warn('1')
     }
 
-    componentDidUpdate() {
-      return fetch('https://accounts.spotify.com/api/token', {
+    componentWillMount() {
+      return fetch('https://accounts.spotify.com/api/token?', {
         method: 'POST',
         headers: {
           Authorization: `Basic `+ this.state.auth,
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: `grant_type=authorization_code&code=`+this.state.code.replace('&state=34fFs29kd09', '')+'&redirect_url=music://spotify.development'
+        body: `grant_type=authorization_code&code=`+this.state.code+`&redirect_uri=music://spotify.development`
       }).then((response) => response.json()).then((responseJson) => {
-        console.warn(responseJson)
+        this.setState({
+            access_token: responseJson.access_token,
+            refresh_token: responseJson.refresh_token
+        })
+        console.warn('2')
       }).catch((error) => {
-        console.error(error);
+        console.log(error);
+      });
+  }
+
+  componentWillUpdate() {
+      return fetch('https://api.spotify.com/v1/me', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer `+ this.state.access_token
+        }
+      }).then((response) => response.json()).then((responseJson) => {
+        this.setState({
+            display_name: responseJson.display_name,
+            id: responseJson.id
+        })
+        console.warn('3')
+      }).catch((error) => {
+        console.log(error);
       });
     }
 
-
-          // grant_type:`authorization_code`,
-          // redirect_url:`music://spotify.development`,
-          // code: this.state.code.replace('&state=34fFs29kd09', '')
-
   render() {
     return (
       <View>
-        <Text>{this.state.code}</Text>
+        <Text>code = {this.state.code}</Text>
+        <Text>access_token = {this.state.access_token}</Text>
+        <Text>refresh_token = {this.state.refresh_token}</Text>
+        <Text>display_name = {this.state.display_name}</Text>
+        <Text>id = {this.state.id}</Text>
       </View>
     );
   }
 
-      // <WebView
-      //   style={{flex:1}}
-      //   source={{uri: this.state.url}}
-      //   onNavigationStateChange={this.onNavigationStateChange}
-      // />
-
-// componentDidMount() {
-//   Linking.getInitialURL().then((url) => {
-//     if (url) {
-//       console.log('Initial url is: ' + url);
-//     }
-//   }).catch(err => console.error('An error occurred', err));
-// }
-
-// componentDidMount() {
-//   Linking.addEventListener('url', this._handleOpenURL);
-// },
-// componentWillUnmount() {
-//   Linking.removeEventListener('url', this._handleOpenURL);
-// }
-// _handleOpenURL(event) {
-//   console.warn(event.url);
-// }
-
-    onNavigationStateChange = navState => {
-      if (navState.url.includes('music://spotify.development/?code=')) {
-          this.setState({code: navState})
-          console.warn(this.state.code)
-      }
-    }
-
-    Token() {
-      console.warn(this.state.code)
-    }
 }
-
-class Token extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            url: this.props.navigation.getParam('url'),
-        };
-    }
-
-  render() {
-    return (
-      <View>
-        <Text>{this.state.url}</Text>
-      </View>
-    );
-  }
-}
-
-const AppNavigator = createStackNavigator(
-  {
-      Authorize: Authorize,
-      Token: Token,
-  },
-  {
-      initialRouteName: 'Authorize',
-  }
-)
-
-export default createAppContainer(AppNavigator)
