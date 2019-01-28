@@ -78,7 +78,11 @@ class Authorize extends Component {
   render() {
     return (
       <View>
-        <Text>{this.state.display_name}</Text>
+        <Text>code = {this.state.code}</Text>
+        <Text>access_token = {this.state.access_token}</Text>
+        <Text>refresh_token = {this.state.refresh_token}</Text>
+        <Text>display_name = {this.state.display_name}</Text>
+        <Text>id = {this.state.id}</Text>
       </View>
     );
   }
