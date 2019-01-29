@@ -24,55 +24,68 @@ class Authorize extends Component {
         super(props);
         this.state = {
             url: `https://accounts.spotify.com/authorize?client_id=` + client_id + `&response_type=code&show_dialog=true&redirect_uri=` + redirect_uri + `&scope=user-read-private user-read-email&state=34fFs29kd09`,
-            code: '',
+            code: null,
             auth: base64.encode(client_id+`:`+client_secret),
-            access_token: '',
-            refresh_token: '',
-            display_name: '',
-            id: ''
+            access_token: null,
+            refresh_token: null,
+            display_name: null,
+            id: null
         };
     }
 
-    componentDidMount() {
-      Linking.openURL(this.state.url).catch(err => console.log(err));
-      Linking.addEventListener('url', ({url}) => this.setState({code: url.replace('music://spotify.development/?code=', '').replace('&state=34fFs29kd09', '')}) );
-      console.warn('1')
+    handleSpotifyLogin = async() => {
+        await Linking.openURL(this.state.url).then((url) => {
+            if (url) {
+                Linking.addEventListener('url', this.handleOpenURL);
+            }
+        }).catch(err => console.log(err));
+    };
+
+    handleOpenURL = async(event) => {
+        this.setState({code: event.url.replace('music://spotify.development/?code=', '').replace('&state=34fFs29kd09', '')})
+        if (event.url.includes('code')) {
+            this.handleToken()
+        }
     }
 
-    componentWillMount() {
-      return fetch('https://accounts.spotify.com/api/token?', {
-        method: 'POST',
-        headers: {
-          Authorization: `Basic `+ this.state.auth,
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: `grant_type=authorization_code&code=`+this.state.code+`&redirect_uri=music://spotify.development`
-      }).then((response) => response.json()).then((responseJson) => {
-        this.setState({
-            access_token: responseJson.access_token,
-            refresh_token: responseJson.refresh_token
+    handleToken = async() => {
+        const response = await fetch('https://accounts.spotify.com/api/token?', {
+            method: 'POST',
+            headers: {
+                Authorization: `Basic ` + this.state.auth,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `grant_type=authorization_code&code=` + this.state.code + `&redirect_uri=music://spotify.development`
         })
-        console.warn('2')
-      }).catch((error) => {
-        console.log(error);
-      });
-  }
-
-  componentWillUpdate() {
-      return fetch('https://api.spotify.com/v1/me', {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer `+ this.state.access_token
+        const json = await response.json();
+        this.setState({
+            access_token: json.access_token,
+            refresh_token: json.refresh_token
+        })
+        if (json.access_token) {
+            this.handleMe()
         }
-      }).then((response) => response.json()).then((responseJson) => {
-        this.setState({
-            display_name: responseJson.display_name,
-            id: responseJson.id
+    }
+
+    handleMe = async() => {
+        const response = await fetch('https://api.spotify.com/v1/me', {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ` + this.state.access_token
+            }
         })
-        console.warn('3')
-      }).catch((error) => {
-        console.log(error);
-      });
+        const json = await response.json();
+        this.setState({
+            display_name: json.display_name,
+            id: json.id
+        })
+        if (json.id) {
+            console.warn(this.state.id)
+        }
+    }
+
+    componentDidMount() {
+      this.handleSpotifyLogin()
     }
 
   render() {
