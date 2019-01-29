@@ -6,7 +6,8 @@ import {
     WebView,
     Linking,
     View,
-    Text
+    Text,
+    Image
 } from 'react-native';
 import {
     createAppContainer,
@@ -19,7 +20,11 @@ var client_id = 'a4fd5d5325454189ba2c3dec27f6fa8c';
 var client_secret = '9c3e9e1ee9394015af9f5db874ccfca2';
 var redirect_uri = 'music://spotify.development';
 
-class Authorize extends Component {
+export default class Authorize extends Component {
+    static navigationOptions = {
+        header: null,
+    }
+
     constructor(props) {
         super(props);
         this.state = {
@@ -29,11 +34,12 @@ class Authorize extends Component {
             access_token: null,
             refresh_token: null,
             display_name: null,
-            id: null
+            id: null,
+            logo: true,
         };
     }
 
-    handleSpotifyLogin = async() => {
+    handleAuthorize = async() => {
         await Linking.openURL(this.state.url).then((url) => {
             if (url) {
                 Linking.addEventListener('url', this.handleOpenURL);
@@ -80,53 +86,41 @@ class Authorize extends Component {
             id: json.id
         })
         if (json.id) {
-            console.warn(this.state.id)
+            this.setState({logo: false})
+            this.props.navigation.navigate('Menu', {
+                access_token: this.state.access_token
+            });
         }
     }
 
     componentDidMount() {
-      this.handleSpotifyLogin()
+        setTimeout(() => {
+
+            this.handleAuthorize()
+
+        }, 5000)
     }
 
-  render() {
-    return (
-      <View>
-        <Text>code = {this.state.code}</Text>
-        <Text>access_token = {this.state.access_token}</Text>
-        <Text>refresh_token = {this.state.refresh_token}</Text>
-        <Text>display_name = {this.state.display_name}</Text>
-        <Text>id = {this.state.id}</Text>
-      </View>
-    );
-  }
-
-}
-
-class Token extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            url: this.props.navigation.getParam('url'),
-        };
+    render() {
+      return (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'white' }}>
+          {
+            this.state.logo
+            ?
+            <Image style={{ width: 125, height: 125 }}
+              source={require('./assets/icon.png')}
+            />
+            :
+            <View>
+                <Text>code = {this.state.code}</Text>
+                <Text>access_token = {this.state.access_token}</Text>
+                <Text>refresh_token = {this.state.refresh_token}</Text>
+                <Text>display_name = {this.state.display_name}</Text>
+                <Text>id = {this.state.id}</Text>
+            </View>
+          }
+        </View>
+      );
     }
 
-  render() {
-    return (
-      <View>
-        <Text>{this.state.url}</Text>
-      </View>
-    );
-  }
 }
-
-const AppNavigator = createStackNavigator(
-  {
-      Authorize: Authorize,
-      Token: Token,
-  },
-  {
-      initialRouteName: 'Authorize',
-  }
-)
-
-export default createAppContainer(AppNavigator)

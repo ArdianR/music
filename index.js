@@ -1,11 +1,27 @@
 import {AppRegistry} from 'react-native';
-import { createAppContainer, createStackNavigator, StackActions, NavigationActions } from 'react-navigation';
+
+import {
+    createAppContainer,
+    createStackNavigator
+} from 'react-navigation';
 
 import Authorize from './Authorize';
-
-// import Login from './Login';
-// import Token from './Token';
+import Menu from './Menu';
 
 import {name as appName} from './app.json';
 
-AppRegistry.registerComponent(appName, () => Authorize);
+
+const AppNavigator = createAppContainer(
+    createStackNavigator({
+        Authorize: {
+            screen: Authorize,
+        },
+        Menu: {
+            screen: Menu,
+        }
+    }, {
+        initialRouteName: 'Authorize',
+    })
+)
+
+AppRegistry.registerComponent(appName, () => AppNavigator);
