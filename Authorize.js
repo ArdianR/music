@@ -50,7 +50,7 @@ export default class Authorize extends Component {
     };
 
     handleOpenURL = async(event) => {
-        this.setState({code: event.url.replace('music://spotify.development/?code=', '').replace('&state=34fFs29kd09', '')})
+        await this.setState({code: event.url.replace('music://spotify.development/?code=', '').replace('&state=34fFs29kd09', '')})
         if (event.url.includes('code')) {
             this.handleToken()
         }
@@ -66,7 +66,7 @@ export default class Authorize extends Component {
             body: `grant_type=authorization_code&code=` + this.state.code + `&redirect_uri=music://spotify.development`
         })
         const json = await response.json();
-        this.setState({
+        await this.setState({
             access_token: json.access_token,
             refresh_token: json.refresh_token
         })
@@ -83,24 +83,20 @@ export default class Authorize extends Component {
             }
         })
         const json = await response.json();
-        this.setState({
+        await this.setState({
             display_name: json.display_name,
             id: json.id
         })
         if (json.id) {
-            this.props.navigation.navigate('Menu', {
+            await this.setState({logo: false})
+            await this.props.navigation.navigate('Menu', {
                 access_token: this.state.access_token
             });
         }
     }
 
     componentDidMount() {
-        setTimeout(() => {
-
-            // this.handleAuthorize();
-            this.setState({logo: false})
-
-        }, 7500)
+        this.handleAuthorize();
     }
 
     render() {

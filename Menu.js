@@ -10,7 +10,9 @@ import {
     TouchableOpacity,
     Dimensions,
     Alert,
-    ActivityIndicator
+    ActivityIndicator,
+    StyleSheet,
+    ScrollView
 } from 'react-native';
 
 export default class Menu extends Component {
@@ -22,8 +24,8 @@ export default class Menu extends Component {
         super(props);
         this.state = {
             access_token: this.props.navigation.getParam('access_token'),
-            height: Dimensions.get('window').width / 3,
-            width: Dimensions.get('window').width / 3,
+            height: Dimensions.get('window').height,
+            width: Dimensions.get('window').width,
             releases: null,
             categories: null,
             orientation: null,
@@ -37,13 +39,17 @@ export default class Menu extends Component {
         const dimension = await this.refs.rootView;
         if(dimension) {
             if( Dimensions.get('window').width < Dimensions.get('window').height ) {
-              this.setState({ orientation: 'portrait' });
-              this.setState({ height: Dimensions.get('window').width / 3 });
-              this.setState({ width: Dimensions.get('window').width / 3 });
+                await this.setState({
+                    orientation: 'portrait',
+                    height: Dimensions.get('window').height,
+                    width: Dimensions.get('window').width
+                });
             } else {
-              this.setState({ orientation: 'landscape' });
-              this.setState({ height: Dimensions.get('window').width / 3 });
-              this.setState({ width: Dimensions.get('window').width / 3 });
+                await this.setState({
+                    orientation: 'landscape',
+                    height: Dimensions.get('window').height,
+                    width: Dimensions.get('window').width
+                });
             }
         }
         if (this.state.orientation !== null) {
@@ -59,11 +65,12 @@ export default class Menu extends Component {
             }
         })
         const json = await response.json();
-        this.setState({
+        await this.setState({
             releases: json.albums.items,
         })
         if (this.state.releases !== null) {
-            this.handleCategories();
+            // await this.handleCategories();
+            await this.setState({activity:false})
         }
 
     }
@@ -76,7 +83,7 @@ export default class Menu extends Component {
             }
         })
         const json = await response.json();
-        this.setState({
+        await this.setState({
             categories: json.categories.items,
         })
         if (this.state.categories !== null) {
@@ -92,7 +99,7 @@ export default class Menu extends Component {
             }
         })
         const json = await response.json();
-        this.setState({
+        await this.setState({
             featured: json.playlists.items,
         })
         if (this.state.featured !== null) {
@@ -101,38 +108,128 @@ export default class Menu extends Component {
     }
 
     handleRecommendations = async() => {
-        const response = await fetch('https://api.spotify.com/v1/recommendations', {
+        const response = await fetch('https://api.spotify.com/v1/recommendations?limit=10&market=ES&seed_artists=4NHQUGzhtTLFvgF5SZesLK&seed_genres=classical%2Ccountry&seed_tracks=0c6xIDDpzE81m2q797ordA', {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${this.state.access_token}`,
             }
         })
         const json = await response.json();
-        this.setState({
-            recommendations: json.recommendations.items,
+        await this.setState({
+            recommendations: json.tracks,
         })
         if (this.state.recommendations !== null) {
-            console.log(this.state.recommendations)
-            // this.setState({
-            //     activity: false,
-            // })
+            await this.setState({
+                activity: false,
+            })
         }
     }
 
     componentDidMount() {
-
         this.handleOrientation();
         Dimensions.addEventListener( 'change', () => {
             this.handleOrientation();
         });
-        
     }
 
     render() {
         return (
-              <View ref = "rootView" style = {{ backgroundColor: ( this.state.orientation == 'portrait' ) ? '#1B5E20' : '#006064' }}>
-                <Text>{ this.state.orientation }</Text>
-              </View>
+            <View ref="rootView" style={[styles.container, styles.horizontal]}>
+                {
+                    this.state.activity
+                    ?
+                        <ActivityIndicator size="large" color="#0000ff"/>
+                    :
+                        <ScrollView>
+                            <View style={{height: this.state.height / 13, flexDirection: 'row', justifyContent: 'space-between'}}>
+                                <Text style={{fontSize: 18, fontWeight: 'bold', alignSelf: 'center', padding: 10, textAlign: 'left', color: 'white'}}>Browse</Text>
+                                <View style={{flexDirection: 'row' }}>
+                                    <Image source={{uri: 'https://facebook.github.io/react/logo-og.png'}} style={{width: 35, height: 35, borderRadius: 25, alignSelf: 'center', margin: 5 }} />
+                                    <Image source={{uri: 'https://facebook.github.io/react/logo-og.png'}} style={{width: 35, height: 35, borderRadius: 25, alignSelf: 'center', margin: 5 }} />
+                                </View>
+                            </View>
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingTop: 20, }}>
+                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'black'}}>New Release</Text>
+                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'black'}}>SeeAll</Text>
+                            </View>
+                            <FlatList
+                                horizontal={true}
+                                data={this.state.releases}
+                                renderItem={({item}) => 
+                                    <View style={{flexWrap: 'wrap'}}>
+                                        <TouchableOpacity onPress={() => this.props.navigation.navigate('Album', { id: '123' }) }>
+                                            <Image style={{ height: this.state.height / 4, width: this.state.width / 1.25, borderRadius: 15, margin: 5 }} source={{uri: item.images[0].url}}/>
+                                            <Text style={{ textAlign: 'center', marginBottom: 15, marginTop: 5 }}>{item.artists[0].name}</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                }
+                                keyExtractor={item => item.id}
+                                flashScrollIndicators={false}
+                            />
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingTop: 20, }}>
+                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'black'}}>New Release</Text>
+                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'black'}}>SeeAll</Text>
+                            </View>
+                            <FlatList
+                                horizontal={true}
+                                data={this.state.releases}
+                                renderItem={({item}) => 
+                                    <View style={{flexWrap: 'wrap'}}>
+                                        <TouchableOpacity onPress={() => this.props.navigation.navigate('Album', { id: '123' }) }>
+                                            <Image style={{ height: this.state.height / 5, width: this.state.height / 5, borderRadius: 15, margin: 5 }} source={{uri: item.images[0].url}}/>
+                                            <Text style={{ textAlign: 'center', marginBottom: 15, marginTop: 5 }}>{item.artists[0].name}</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                }
+                                keyExtractor={item => item.id}
+                                flashScrollIndicators={false}
+                            />
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingTop: 20, }}>
+                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'black'}}>New Release</Text>
+                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'black'}}>SeeAll</Text>
+                            </View>
+                            <FlatList
+                                horizontal={true}
+                                data={this.state.releases}
+                                renderItem={({item}) => 
+                                    <View style={{flexWrap: 'wrap'}}>
+                                        <TouchableOpacity onPress={() => this.props.navigation.navigate('Album', { id: '123' }) }>
+                                            <Image style={{ height: this.state.height / 5, width: this.state.height / 5, borderRadius: 15, margin: 5 }} source={{uri: item.images[0].url}}/>
+                                            <Text style={{ textAlign: 'center', marginBottom: 15, marginTop: 5 }}>{item.artists[0].name}</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                }
+                                keyExtractor={item => item.id}
+                                flashScrollIndicators={false}
+                            />
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingTop: 20, }}>
+                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'black'}}>New Release</Text>
+                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'black'}}>SeeAll</Text>
+                            </View>
+                            <FlatList
+                                horizontal={true}
+                                data={this.state.releases}
+                                renderItem={({item}) => 
+                                    <View style={{flexWrap: 'wrap'}}>
+                                        <TouchableOpacity onPress={() => this.props.navigation.navigate('Album', { id: '123' }) }>
+                                            <Image style={{ height: this.state.height / 5, width: this.state.height / 5, borderRadius: 15, margin: 5 }} source={{uri: item.images[0].url}}/>
+                                            <Text style={{ textAlign: 'center', marginBottom: 15, marginTop: 5 }}>{item.artists[0].name}</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                }
+                                keyExtractor={item => item.id}
+                                flashScrollIndicators={false}
+                            />
+                        </ScrollView>
+                }
+            </View>
         );
     }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+  }
+})
