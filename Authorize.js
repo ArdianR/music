@@ -7,7 +7,8 @@ import {
     Linking,
     View,
     Text,
-    Image
+    Image,
+    ActivityIndicator
 } from 'react-native';
 import {
     createAppContainer,
@@ -36,6 +37,7 @@ export default class Authorize extends Component {
             display_name: null,
             id: null,
             logo: true,
+            activity: true
         };
     }
 
@@ -86,7 +88,6 @@ export default class Authorize extends Component {
             id: json.id
         })
         if (json.id) {
-            this.setState({logo: false})
             this.props.navigation.navigate('Menu', {
                 access_token: this.state.access_token
             });
@@ -96,9 +97,10 @@ export default class Authorize extends Component {
     componentDidMount() {
         setTimeout(() => {
 
-            this.handleAuthorize()
+            // this.handleAuthorize();
+            this.setState({logo: false})
 
-        }, 5000)
+        }, 7500)
     }
 
     render() {
