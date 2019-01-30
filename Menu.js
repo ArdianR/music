@@ -69,8 +69,7 @@ export default class Menu extends Component {
             releases: json.albums.items,
         })
         if (this.state.releases !== null) {
-            // await this.handleCategories();
-            await this.setState({activity:false})
+            await this.handleCategories();
         }
 
     }
@@ -87,7 +86,9 @@ export default class Menu extends Component {
             categories: json.categories.items,
         })
         if (this.state.categories !== null) {
-            this.handleFeatured();
+            // this.handleFeatured();
+            console.log(json)
+            await this.setState({activity:false})
         }
     }
 
@@ -141,84 +142,53 @@ export default class Menu extends Component {
                         <ActivityIndicator size="large" color="#0000ff"/>
                     :
                         <ScrollView>
-                            <View style={{height: this.state.height / 13, flexDirection: 'row', justifyContent: 'space-between'}}>
-                                <Text style={{fontSize: 18, fontWeight: 'bold', alignSelf: 'center', padding: 10, textAlign: 'left', color: 'white'}}>Browse</Text>
-                                <View style={{flexDirection: 'row' }}>
-                                    <Image source={{uri: 'https://facebook.github.io/react/logo-og.png'}} style={{width: 35, height: 35, borderRadius: 25, alignSelf: 'center', margin: 5 }} />
-                                    <Image source={{uri: 'https://facebook.github.io/react/logo-og.png'}} style={{width: 35, height: 35, borderRadius: 25, alignSelf: 'center', margin: 5 }} />
+                            <View style={{height: this.state.height / 13, flexDirection: 'row', justifyContent: 'space-between', marginLeft: 20}}>
+                                <Text style={{fontSize: 20, fontWeight: 'bold', alignSelf: 'center', textAlign: 'left', color: 'white'}}>Browse</Text>
+                                <View style={{flexDirection: 'row', marginRight: 20}}>
+                                    <Image source={{uri: 'https://facebook.github.io/react/logo-og.png'}} style={{width: 40, height: 40, borderRadius: 25, alignSelf: 'center' }} />
+                                    <Image source={{uri: 'https://facebook.github.io/react/logo-og.png'}} style={{width: 35, height: 35, borderRadius: 25, alignSelf: 'center', marginLeft: 15 }} />
                                 </View>
                             </View>
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingTop: 20, }}>
-                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'black'}}>New Release</Text>
-                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'black'}}>SeeAll</Text>
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', margin: 10}}>
+                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>New Release</Text>
+                                <TouchableOpacity>
+                                    <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>See All</Text>
+                                </TouchableOpacity>
                             </View>
                             <FlatList
                                 horizontal={true}
                                 data={this.state.releases}
                                 renderItem={({item}) => 
                                     <View style={{flexWrap: 'wrap'}}>
-                                        <TouchableOpacity onPress={() => this.props.navigation.navigate('Album', { id: '123' }) }>
-                                            <Image style={{ height: this.state.height / 4, width: this.state.width / 1.25, borderRadius: 15, margin: 5 }} source={{uri: item.images[0].url}}/>
-                                            <Text style={{ textAlign: 'center', marginBottom: 15, marginTop: 5 }}>{item.artists[0].name}</Text>
+                                        <TouchableOpacity>
+                                            <ImageBackground style={{ height: this.state.height / 3.5, width: this.state.width / 1.25, marginLeft: 20, alignItems: 'center', justifyContent: 'center'}} imageStyle={{ borderRadius: 15 }} source={{uri: item.images[0].url}}>
+                                                <Text style={{ textAlign: 'center', fontSize: 35, fontWeight: '900', color: 'white'}}>{item.artists[0].name}</Text>
+                                            </ImageBackground>
                                         </TouchableOpacity>
                                     </View>
                                 }
                                 keyExtractor={item => item.id}
-                                flashScrollIndicators={false}
+                                showsHorizontalScrollIndicator={false}
                             />
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingTop: 20, }}>
-                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'black'}}>New Release</Text>
-                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'black'}}>SeeAll</Text>
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', margin: 10, paddingTop: 25}}>
+                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>Categories</Text>
+                                <TouchableOpacity>
+                                    <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>See All</Text>
+                                </TouchableOpacity>
                             </View>
                             <FlatList
                                 horizontal={true}
-                                data={this.state.releases}
+                                data={this.state.categories}
                                 renderItem={({item}) => 
                                     <View style={{flexWrap: 'wrap'}}>
-                                        <TouchableOpacity onPress={() => this.props.navigation.navigate('Album', { id: '123' }) }>
-                                            <Image style={{ height: this.state.height / 5, width: this.state.height / 5, borderRadius: 15, margin: 5 }} source={{uri: item.images[0].url}}/>
-                                            <Text style={{ textAlign: 'center', marginBottom: 15, marginTop: 5 }}>{item.artists[0].name}</Text>
+                                        <TouchableOpacity>
+                                            <Image style={{ height: 100, width: 100, marginLeft: 20, alignItems: 'center', justifyContent: 'center'}} source={{uri: item.icons[0].url}}/>
+                                            <Text style={{ textAlign: 'center', fontSize: 16, fontWeight: '900', color: 'white'}}>{item.name}</Text>
                                         </TouchableOpacity>
                                     </View>
                                 }
                                 keyExtractor={item => item.id}
-                                flashScrollIndicators={false}
-                            />
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingTop: 20, }}>
-                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'black'}}>New Release</Text>
-                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'black'}}>SeeAll</Text>
-                            </View>
-                            <FlatList
-                                horizontal={true}
-                                data={this.state.releases}
-                                renderItem={({item}) => 
-                                    <View style={{flexWrap: 'wrap'}}>
-                                        <TouchableOpacity onPress={() => this.props.navigation.navigate('Album', { id: '123' }) }>
-                                            <Image style={{ height: this.state.height / 5, width: this.state.height / 5, borderRadius: 15, margin: 5 }} source={{uri: item.images[0].url}}/>
-                                            <Text style={{ textAlign: 'center', marginBottom: 15, marginTop: 5 }}>{item.artists[0].name}</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                }
-                                keyExtractor={item => item.id}
-                                flashScrollIndicators={false}
-                            />
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingTop: 20, }}>
-                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'black'}}>New Release</Text>
-                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'black'}}>SeeAll</Text>
-                            </View>
-                            <FlatList
-                                horizontal={true}
-                                data={this.state.releases}
-                                renderItem={({item}) => 
-                                    <View style={{flexWrap: 'wrap'}}>
-                                        <TouchableOpacity onPress={() => this.props.navigation.navigate('Album', { id: '123' }) }>
-                                            <Image style={{ height: this.state.height / 5, width: this.state.height / 5, borderRadius: 15, margin: 5 }} source={{uri: item.images[0].url}}/>
-                                            <Text style={{ textAlign: 'center', marginBottom: 15, marginTop: 5 }}>{item.artists[0].name}</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                }
-                                keyExtractor={item => item.id}
-                                flashScrollIndicators={false}
+                                showsHorizontalScrollIndicator={false}
                             />
                         </ScrollView>
                 }
@@ -231,5 +201,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    backgroundColor: 'black'
   }
 })

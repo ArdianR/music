@@ -70,6 +70,7 @@ export default class Authorize extends Component {
             access_token: json.access_token,
             refresh_token: json.refresh_token
         })
+        console.log(json.access_token)
         if (json.access_token) {
             this.handleMe()
         }
@@ -109,13 +110,7 @@ export default class Authorize extends Component {
               source={require('./assets/icon.png')}
             />
             :
-            <View>
-                <Text>code = {this.state.code}</Text>
-                <Text>access_token = {this.state.access_token}</Text>
-                <Text>refresh_token = {this.state.refresh_token}</Text>
-                <Text>display_name = {this.state.display_name}</Text>
-                <Text>id = {this.state.id}</Text>
-            </View>
+            <ActivityIndicator size="large" color="#0000ff"/>
           }
         </View>
       );
