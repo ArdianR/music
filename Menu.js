@@ -83,11 +83,10 @@ export default class Menu extends Component {
         })
         const json = await response.json();
         await this.setState({
-            categories: json.categories.items,
+            categories: json.categories.items
         })
         if (this.state.categories !== null) {
-            // this.handleFeatured();
-            await this.setState({activity:false})
+            this.handleFeatured();
         }
     }
 
@@ -119,9 +118,7 @@ export default class Menu extends Component {
             recommendations: json.tracks,
         })
         if (this.state.recommendations !== null) {
-            await this.setState({
-                activity: false,
-            })
+            await this.setState({activity:false})
         }
     }
 
@@ -130,6 +127,18 @@ export default class Menu extends Component {
         Dimensions.addEventListener( 'change', () => {
             this.handleOrientation();
         });
+    }
+
+    renderBrowse() {
+        return (
+            <View style={{height: this.state.height / 13, flexDirection: 'row', justifyContent: 'space-between', marginLeft: 20}}>
+                <Text style={{fontSize: 20, fontWeight: 'bold', alignSelf: 'center', textAlign: 'left', color: 'white'}}>Browse</Text>
+                <View style={{flexDirection: 'row', marginRight: 20}}>
+                    <Image source={{uri: 'https://facebook.github.io/react/logo-og.png'}} style={{width: 40, height: 40, borderRadius: 25, alignSelf: 'center' }} />
+                    <Image source={{uri: 'https://facebook.github.io/react/logo-og.png'}} style={{width: 35, height: 35, borderRadius: 25, alignSelf: 'center', marginLeft: 15 }} />
+                </View>
+            </View>
+        )
     }
 
     render() {
@@ -141,13 +150,7 @@ export default class Menu extends Component {
                         <ActivityIndicator size="large" color="#0000ff"/>
                     :
                         <ScrollView>
-                            <View style={{height: this.state.height / 13, flexDirection: 'row', justifyContent: 'space-between', marginLeft: 20}}>
-                                <Text style={{fontSize: 20, fontWeight: 'bold', alignSelf: 'center', textAlign: 'left', color: 'white'}}>Browse</Text>
-                                <View style={{flexDirection: 'row', marginRight: 20}}>
-                                    <Image source={{uri: 'https://facebook.github.io/react/logo-og.png'}} style={{width: 40, height: 40, borderRadius: 25, alignSelf: 'center' }} />
-                                    <Image source={{uri: 'https://facebook.github.io/react/logo-og.png'}} style={{width: 35, height: 35, borderRadius: 25, alignSelf: 'center', marginLeft: 15 }} />
-                                </View>
-                            </View>
+                            {this.renderBrowse()}
                             <View style={{flexDirection: 'row', justifyContent: 'space-between', margin: 10}}>
                                 <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>New Release</Text>
                                 <TouchableOpacity>
@@ -180,15 +183,65 @@ export default class Menu extends Component {
                                 data={this.state.categories}
                                 renderItem={({item}) => 
                                     <View style={{flexWrap: 'wrap'}}>
-                                        <TouchableOpacity>
-                                            <Image style={{ height: 100, width: 100, marginLeft: 20, alignItems: 'center', justifyContent: 'center'}} source={{uri: item.icons[0].url}}/>
-                                            <Text style={{ textAlign: 'center', fontSize: 16, fontWeight: '900', color: 'white'}}>{item.name}</Text>
-                                        </TouchableOpacity>
-                                            <ImageBackground style={{ height: 100, width: 100, marginLeft: 20, alignItems: 'center', justifyContent: 'center'}} imageStyle={{ borderRadius: 15 }} source={{uri: item.icons[0].url}}>
-                                                <TouchableOpacity>
-                                                    <Text style={{ textAlign: 'center', fontSize: 16, fontWeight: '900', color: 'white'}}>{item.name}</Text>
+                                        {
+                                            item.icons.map(icons => (
+                                                <TouchableOpacity key={icons.url}>
+                                                    <ImageBackground  style={{ height: 100, width: 100, marginLeft: 20, justifyContent: 'flex-end', alignItems: 'center' }} imageStyle={{ borderRadius: 15 }} source={{uri: icons.url}}>
+                                                        <Text style={{ fontSize: 16, fontWeight: '900', color: 'white'}}>{item.name.substr(0, 10)}</Text>
+                                                    </ImageBackground>
                                                 </TouchableOpacity>
-                                            </ImageBackground>
+                                            ))
+                                        }
+                                    </View>
+                                }
+                                keyExtractor={item => item.id}
+                                showsHorizontalScrollIndicator={false}
+                            />
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', margin: 10, paddingTop: 25}}>
+                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>Featured</Text>
+                                <TouchableOpacity>
+                                    <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>See All</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <FlatList
+                                horizontal={true}
+                                data={this.state.featured}
+                                renderItem={({item}) => 
+                                    <View style={{flexWrap: 'wrap'}}>
+                                        {
+                                            item.images.map(images => (
+                                                <TouchableOpacity key={images.url}>
+                                                    <ImageBackground  style={{ height: 100, width: 100, marginLeft: 20, justifyContent: 'flex-end', alignItems: 'center' }} imageStyle={{ borderRadius: 15 }} source={{uri: images.url}}>
+                                                        <Text style={{ fontSize: 16, fontWeight: '900', color: 'white'}}>{item.name.substr(0, 10)}</Text>
+                                                    </ImageBackground>
+                                                </TouchableOpacity>
+                                            ))
+                                        }
+                                    </View>
+                                }
+                                keyExtractor={item => item.id}
+                                showsHorizontalScrollIndicator={false}
+                            />
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', margin: 10, paddingTop: 25}}>
+                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>Recommendations</Text>
+                                <TouchableOpacity>
+                                    <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>See All</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <FlatList
+                                horizontal={true}
+                                data={this.state.recommendations}
+                                renderItem={({item}) => 
+                                    <View style={{flexWrap: 'wrap'}}>
+                                        {
+                                            item.album.images.map(images => (
+                                                <TouchableOpacity key={images.url}>
+                                                    <ImageBackground style={{ height: 100, width: 100, marginLeft: 20, justifyContent: 'flex-end', alignItems: 'center' }} imageStyle={{ borderRadius: 15 }} source={{uri: images.url}}>
+                                                    </ImageBackground>
+                                                </TouchableOpacity>
+                                            ))   
+                                        }
+                                                        <Text style={{ fontSize: 16, fontWeight: '900', color: 'white'}}>{item.name}</Text>
                                     </View>
                                 }
                                 keyExtractor={item => item.id}
