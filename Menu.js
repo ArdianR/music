@@ -151,12 +151,7 @@ export default class Menu extends Component {
                     :
                         <ScrollView>
                             {this.renderBrowse()}
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between', margin: 10}}>
-                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>New Release</Text>
-                                <TouchableOpacity>
-                                    <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>See All</Text>
-                                </TouchableOpacity>
-                            </View>
+                            <HomeTitle nameCategory='New Release'/>
                             <FlatList
                                 horizontal={true}
                                 data={this.state.releases}
@@ -172,12 +167,7 @@ export default class Menu extends Component {
                                 keyExtractor={item => item.id}
                                 showsHorizontalScrollIndicator={false}
                             />
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between', margin: 10, paddingTop: 25}}>
-                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>Categories</Text>
-                                <TouchableOpacity>
-                                    <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>See All</Text>
-                                </TouchableOpacity>
-                            </View>
+                            <HomeTitle nameCategory='Categories'/>
                             <FlatList
                                 horizontal={true}
                                 data={this.state.categories}
@@ -197,12 +187,7 @@ export default class Menu extends Component {
                                 keyExtractor={item => item.id}
                                 showsHorizontalScrollIndicator={false}
                             />
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between', margin: 10, paddingTop: 25}}>
-                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>Featured</Text>
-                                <TouchableOpacity>
-                                    <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>See All</Text>
-                                </TouchableOpacity>
-                            </View>
+                            <HomeTitle nameCategory='Featured'/>
                             <FlatList
                                 horizontal={true}
                                 data={this.state.featured}
@@ -222,30 +207,8 @@ export default class Menu extends Component {
                                 keyExtractor={item => item.id}
                                 showsHorizontalScrollIndicator={false}
                             />
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between', margin: 10, paddingTop: 25}}>
-                                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>Recommendations</Text>
-                                <TouchableOpacity>
-                                    <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>See All</Text>
-                                </TouchableOpacity>
-                            </View>
-                            <FlatList
-                                horizontal={true}
-                                data={this.state.recommendations}
-                                renderItem={({item}) => 
-                                    <View style={{flexWrap: 'wrap'}}>
-                                        {
-                                            item.album.images.map(images => (
-                                                <TouchableOpacity key={images.url}>
-                                                    <ImageBackground style={{ height: 100, width: 100, marginLeft: 20, justifyContent: 'flex-end', alignItems: 'center' }} imageStyle={{ borderRadius: 15 }} source={{uri: images.url}}>
-                                                    </ImageBackground>
-                                                </TouchableOpacity>
-                                            ))   
-                                        }
-                                                        <Text style={{ fontSize: 16, fontWeight: '900', color: 'white'}}>{item.name}</Text>
-                                    </View>
-                                }
-                                keyExtractor={item => item.id}
-                                showsHorizontalScrollIndicator={false}
+                            <HomeFlatlist
+                                dataSource={this.state.featured}
                             />
                         </ScrollView>
                 }
@@ -261,3 +224,43 @@ const styles = StyleSheet.create({
     backgroundColor: 'black'
   }
 })
+
+
+class HomeTitle extends Component {
+  render() {
+    return (
+        <View style={{flexDirection: 'row', justifyContent: 'space-between', margin: 10}}>
+            <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>{this.props.nameCategory}</Text>
+            <TouchableOpacity>
+                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>See All</Text>
+            </TouchableOpacity>
+        </View>
+    );
+  }
+}
+
+class HomeFlatlist extends Component {
+  render() {
+    return (
+        <FlatList
+            horizontal={true}
+            data={this.props.dataSource}
+            renderItem={({item}) => 
+                <View style={{flexWrap: 'wrap'}}>
+                    {
+                        item.images.map(images => (
+                            <TouchableOpacity key={images.url}>
+                                <ImageBackground  style={{ height: 100, width: 100, marginLeft: 20, justifyContent: 'flex-end', alignItems: 'center' }} imageStyle={{ borderRadius: 15 }} source={{uri: images.url}}>
+                                    <Text style={{ fontSize: 16, fontWeight: '900', color: 'white'}}>{item.name.substr(0, 10)}</Text>
+                                </ImageBackground>
+                            </TouchableOpacity>
+                        ))
+                    }
+                </View>
+            }
+            keyExtractor={item => item.id}
+            showsHorizontalScrollIndicator={false}
+        />
+    );
+  }
+}
