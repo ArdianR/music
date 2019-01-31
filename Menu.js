@@ -87,7 +87,6 @@ export default class Menu extends Component {
         })
         if (this.state.categories !== null) {
             // this.handleFeatured();
-            console.log(json)
             await this.setState({activity:false})
         }
     }
@@ -185,6 +184,11 @@ export default class Menu extends Component {
                                             <Image style={{ height: 100, width: 100, marginLeft: 20, alignItems: 'center', justifyContent: 'center'}} source={{uri: item.icons[0].url}}/>
                                             <Text style={{ textAlign: 'center', fontSize: 16, fontWeight: '900', color: 'white'}}>{item.name}</Text>
                                         </TouchableOpacity>
+                                            <ImageBackground style={{ height: 100, width: 100, marginLeft: 20, alignItems: 'center', justifyContent: 'center'}} imageStyle={{ borderRadius: 15 }} source={{uri: item.icons[0].url}}>
+                                                <TouchableOpacity>
+                                                    <Text style={{ textAlign: 'center', fontSize: 16, fontWeight: '900', color: 'white'}}>{item.name}</Text>
+                                                </TouchableOpacity>
+                                            </ImageBackground>
                                     </View>
                                 }
                                 keyExtractor={item => item.id}
