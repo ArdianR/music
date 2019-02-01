@@ -114,6 +114,7 @@ export default class Menu extends Component {
             }
         })
         const json = await response.json();
+        console.log(json.tracks)
         await this.setState({
             recommendations: json.tracks,
         })
@@ -129,18 +130,6 @@ export default class Menu extends Component {
         });
     }
 
-    renderBrowse() {
-        return (
-            <View style={{height: this.state.height / 13, flexDirection: 'row', justifyContent: 'space-between', marginLeft: 20}}>
-                <Text style={{fontSize: 20, fontWeight: 'bold', alignSelf: 'center', textAlign: 'left', color: 'white'}}>Browse</Text>
-                <View style={{flexDirection: 'row', marginRight: 20}}>
-                    <Image source={{uri: 'https://facebook.github.io/react/logo-og.png'}} style={{width: 40, height: 40, borderRadius: 25, alignSelf: 'center' }} />
-                    <Image source={{uri: 'https://facebook.github.io/react/logo-og.png'}} style={{width: 35, height: 35, borderRadius: 25, alignSelf: 'center', marginLeft: 15 }} />
-                </View>
-            </View>
-        )
-    }
-
     render() {
         return (
             <View ref="rootView" style={[styles.container, styles.horizontal]}>
@@ -150,8 +139,8 @@ export default class Menu extends Component {
                         <ActivityIndicator size="large" color="#0000ff"/>
                     :
                         <ScrollView>
-                            {this.renderBrowse()}
-                            <HomeTitle nameCategory='New Release'/>
+                            <Browse height={this.state.height / 13} />
+                            <Title nameCategory='New Release'/>
                             <FlatList
                                 horizontal={true}
                                 data={this.state.releases}
@@ -167,7 +156,7 @@ export default class Menu extends Component {
                                 keyExtractor={item => item.id}
                                 showsHorizontalScrollIndicator={false}
                             />
-                            <HomeTitle nameCategory='Categories'/>
+                            <Title nameCategory='Categories'/>
                             <FlatList
                                 horizontal={true}
                                 data={this.state.categories}
@@ -187,7 +176,7 @@ export default class Menu extends Component {
                                 keyExtractor={item => item.id}
                                 showsHorizontalScrollIndicator={false}
                             />
-                            <HomeTitle nameCategory='Featured'/>
+                            <Title nameCategory='Featured'/>
                             <FlatList
                                 horizontal={true}
                                 data={this.state.featured}
@@ -207,8 +196,19 @@ export default class Menu extends Component {
                                 keyExtractor={item => item.id}
                                 showsHorizontalScrollIndicator={false}
                             />
-                            <HomeFlatlist
-                                dataSource={this.state.featured}
+                            <Title nameCategory='Recommendations'/>
+                            <FlatList
+                                horizontal={true}
+                                data={this.state.recommendations}
+                                renderItem={({item}) => 
+                                    <Body 
+                                        imageKey={item.id}
+                                        imageUrl={item.album.images[0].url}
+                                        imageName={item.name.substr(0, 10)}
+                                    />
+                                }
+                                keyExtractor={item => item.id}
+                                showsHorizontalScrollIndicator={false}
                             />
                         </ScrollView>
                 }
@@ -225,8 +225,21 @@ const styles = StyleSheet.create({
   }
 })
 
+class Browse extends React.PureComponent {
+    render() {
+        return (
+            <View style={{height: this.props.height, flexDirection: 'row', justifyContent: 'space-between', marginLeft: 20}}>
+                <Text style={{fontSize: 20, fontWeight: 'bold', alignSelf: 'center', textAlign: 'left', color: 'white'}}>Browse</Text>
+                <View style={{flexDirection: 'row', marginRight: 20}}>
+                    <Image source={{uri: 'https://facebook.github.io/react/logo-og.png'}} style={{width: 40, height: 40, borderRadius: 25, alignSelf: 'center' }} />
+                    <Image source={{uri: 'https://facebook.github.io/react/logo-og.png'}} style={{width: 35, height: 35, borderRadius: 25, alignSelf: 'center', marginLeft: 15 }} />
+                </View>
+            </View>
+        );
+    }
+}
 
-class HomeTitle extends Component {
+class Title extends React.PureComponent {
   render() {
     return (
         <View style={{flexDirection: 'row', justifyContent: 'space-between', margin: 10}}>
@@ -239,28 +252,14 @@ class HomeTitle extends Component {
   }
 }
 
-class HomeFlatlist extends Component {
-  render() {
-    return (
-        <FlatList
-            horizontal={true}
-            data={this.props.dataSource}
-            renderItem={({item}) => 
-                <View style={{flexWrap: 'wrap'}}>
-                    {
-                        item.images.map(images => (
-                            <TouchableOpacity key={images.url}>
-                                <ImageBackground  style={{ height: 100, width: 100, marginLeft: 20, justifyContent: 'flex-end', alignItems: 'center' }} imageStyle={{ borderRadius: 15 }} source={{uri: images.url}}>
-                                    <Text style={{ fontSize: 16, fontWeight: '900', color: 'white'}}>{item.name.substr(0, 10)}</Text>
-                                </ImageBackground>
-                            </TouchableOpacity>
-                        ))
-                    }
-                </View>
-            }
-            keyExtractor={item => item.id}
-            showsHorizontalScrollIndicator={false}
-        />
-    );
-  }
+class Body extends React.PureComponent {
+    render() {
+        return (
+            <View style={{flexWrap: 'wrap'}} key={this.props.imageKey}>
+                <ImageBackground  style={{ height: 100, width: 100, marginLeft: 20, justifyContent: 'flex-end', alignItems: 'center' }} imageStyle={{ borderRadius: 15 }} source={{uri: this.props.imageUrl }}>
+                    <Text style={{ fontSize: 16, fontWeight: '900', color: 'white'}}>{this.props.imageName}</Text>
+                </ImageBackground>
+            </View>
+        );
+    }
 }

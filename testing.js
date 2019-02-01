@@ -244,3 +244,15 @@
                                 dataImageBackground={images.url}
                                 dataTextName={item.name.substr(0, 10)}
                                 dataKeyExtractor={item.id}      
+
+
+
+            {
+                item.images.map(images => (
+                    <TouchableOpacity key={images.url}>
+                        <ImageBackground  style={{ height: 100, width: 100, marginLeft: 20, justifyContent: 'flex-end', alignItems: 'center' }} imageStyle={{ borderRadius: 15 }} source={{uri: images.url}}>
+                            <Text style={{ fontSize: 16, fontWeight: '900', color: 'white'}}>{item.name.substr(0, 10)}</Text>
+                        </ImageBackground>
+                    </TouchableOpacity>
+                ))
+            }
