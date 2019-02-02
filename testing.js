@@ -256,3 +256,12 @@
                     </TouchableOpacity>
                 ))
             }
+
+
+      <View style={{flex:1, backgroundColor: 'black' }}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', padding: 10}}>
+              <Ionicons name="ios-search" size={40} color="white"/>
+              <Text style={{color: "white", fontSize: 18}}>Search</Text>
+              <Text style={{color: "white", fontSize: 22}}>Close</Text>
+          </View>            
+      </View>

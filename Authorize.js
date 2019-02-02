@@ -89,10 +89,10 @@ export default class Authorize extends Component {
             id: json.id
         })
         if (json.id) {
-            await this.setState({logo: false})
-            await this.props.navigation.navigate('Menu', {
+            await this.props.navigation.navigate('Player', {
                 access_token: this.state.access_token
             });
+            await this.setState({logo: false})
         }
     }
 
