@@ -18,11 +18,35 @@ export default class Player extends Component {
         header: null,
     }
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
+            access_token: this.props.navigation.getParam('access_token'),
             SliderValue: 0
         }
+    }
+
+
+    handleGetDevices = async() => {
+        const response = await fetch('https://api.spotify.com/v1/me/player/devices', {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${this.state.access_token}`,
+            }
+        })
+        const json = await response.json();
+        console.log(json)
+        // await this.setState({
+        //     releases: json.albums.items,
+        // })
+        // if (this.state.releases !== null) {
+        //     await this.handleCategories();
+        // }
+
+    }
+
+    componentDidMount() {
+        this.handleGetDevices();
     }
 
     render() {

@@ -6,10 +6,11 @@ import {
     View,
     FlatList,
     StyleSheet,
-    ActivityIndicator
+    ActivityIndicator,
+    TouchableOpacity
 } from 'react-native';
 
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Header from './Header';
 
 export default class Search extends Component {
     static navigationOptions = {
@@ -21,7 +22,7 @@ export default class Search extends Component {
         this.state = {
             access_token: this.props.navigation.getParam('access_token'),
             categories: null,
-            activity: true
+            activity: false
         }
     }
 
@@ -42,7 +43,7 @@ export default class Search extends Component {
     }
 
     componentDidMount() {
-        this.handleCategories();
+        // this.handleCategories();
     }
 
   render() {
@@ -118,14 +119,3 @@ const styles = StyleSheet.create({
     }
 
 })
-
-class Header extends React.PureComponent {
-    render() {
-        return(
-            <View style={{flex:1, backgroundColor: 'black', padding: 20, flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Ionicons name="ios-search" size={40} color="white"/>
-                <Text style={{color: "white", fontSize: 22}}>Close</Text>
-            </View>    
-        );
-    }
-}

@@ -10,16 +10,13 @@ import {
     Image,
     ActivityIndicator
 } from 'react-native';
-import {
-    createAppContainer,
-    createStackNavigator
-} from 'react-navigation';
 
 import base64 from 'react-native-base64';
 
 var client_id = 'a4fd5d5325454189ba2c3dec27f6fa8c';
 var client_secret = '9c3e9e1ee9394015af9f5db874ccfca2';
 var redirect_uri = 'music://spotify.development';
+var scope = 'user-read-private user-read-email playlist-read-private playlist-modify-private playlist-modify-public playlist-read-collaborative user-modify-playback-state user-read-currently-playing user-read-playback-state user-top-read user-read-recently-played app-remote-control streaming user-read-birthdate user-follow-read user-follow-modify user-library-modify user-library-read';
 
 export default class Authorize extends Component {
     static navigationOptions = {
@@ -29,7 +26,7 @@ export default class Authorize extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            url: `https://accounts.spotify.com/authorize?client_id=` + client_id + `&response_type=code&show_dialog=true&redirect_uri=` + redirect_uri + `&scope=user-read-private user-read-email&state=34fFs29kd09`,
+            url: `https://accounts.spotify.com/authorize?client_id=` + client_id + `&response_type=code&show_dialog=true&redirect_uri=` + redirect_uri + `&scope=`+ scope +`&state=34fFs29kd09`,
             code: null,
             auth: base64.encode(client_id+`:`+client_secret),
             access_token: null,
@@ -89,7 +86,7 @@ export default class Authorize extends Component {
             id: json.id
         })
         if (json.id) {
-            await this.props.navigation.navigate('Player', {
+            await this.props.navigation.navigate('Playlist', {
                 access_token: this.state.access_token
             });
             await this.setState({logo: false})

@@ -14,12 +14,12 @@ import {
     ScrollView
 } from 'react-native';
 
-import {
-    createAppContainer,
-    createStackNavigator
-} from 'react-navigation';
-
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import styles from './Styles';
+
+import Browse from './Browse';
+import Title from './Title';
+import Body from './Body';
 
 export default class Menu extends Component {
     static navigationOptions = {
@@ -210,97 +210,6 @@ export default class Menu extends Component {
                     showsHorizontalScrollIndicator={false}
                 />
                 </ScrollView>
-            </View>
-        );
-    }
-}
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        backgroundColor: 'black'
-    },
-    bodyImageLarge: {
-        height: 175,
-        width: 350,
-        marginLeft: 20,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    bodyImageSmall: {
-        height: 100,
-        width: 100,
-        marginLeft: 20,
-        justifyContent: 'flex-end',
-        alignItems: 'center'
-    },
-    bodyTitleSmall: {
-        fontSize: 16,
-        fontWeight: '900',
-        color: 'white'
-    },
-    bodyTitleLarge: {
-        textAlign: 'center',
-        fontSize: 35,
-        fontWeight: '900',
-        color: 'white'
-    },
-    browseContainer: {
-        height: 75,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginLeft: 20
-    },
-    browseLeftText: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        alignSelf: 'center',
-        textAlign: 'left',
-        color: 'white'
-    }
-
-})
-
-class Browse extends React.PureComponent {
-    render() {
-        return (
-            <View style={styles.browseContainer}>
-                <Text style={styles.browseLeftText}>Browse</Text>
-                <View style={{flexDirection: 'row', marginRight: 20}}>
-                    <Image source={{uri: 'https://facebook.github.io/react/logo-og.png'}} style={{width: 40, height: 40, borderRadius: 25, alignSelf: 'center' }} />
-                    <TouchableOpacity style={{ justifyContent: 'center' }}>     
-                        <Ionicons name="ios-search" size={40} color="white" style={{width: 35, height: 35, borderRadius: 25, alignSelf: 'center', marginLeft: 15 }}/>
-                    </TouchableOpacity>
-                </View>
-            </View>
-        );
-    }
-}
-
-class Title extends React.PureComponent {
-  render() {
-    return (
-        <View style={{flexDirection: 'row', justifyContent: 'space-between', margin: 10}}>
-            <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>{this.props.nameCategory}</Text>
-            <TouchableOpacity>
-                <Text style={{fontSize: 18, fontWeight: 'bold', padding: 10, color: 'white'}}>See All</Text>
-            </TouchableOpacity>
-        </View>
-    );
-  }
-}
-
-class Body extends React.PureComponent {
-    render() {
-        return (
-            <View style={{flexWrap: 'wrap'}} key={this.props.imageKey}>
-                <ImageBackground
-                    style={this.props.bodyImage}
-                    imageStyle={{ borderRadius: 15 }}
-                    source={{uri: this.props.imageUrl }}>
-                    <Text style={this.props.bodyTitle}>{this.props.imageName}</Text>
-                </ImageBackground>
             </View>
         );
     }

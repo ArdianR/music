@@ -6,7 +6,7 @@ import {
     View
 } from 'react-native';
 
-export default class Artist extends Component {
+export default class Album extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -15,9 +15,9 @@ export default class Artist extends Component {
     }
     render() {
         return ( 
-          <View>
-            <Text> Hello world! </Text>
-          </View>
+        	<View>
+        		<Text> Hello world! </Text>
+        	</View>
         );
     }
 }
