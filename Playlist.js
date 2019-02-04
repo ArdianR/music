@@ -3,7 +3,8 @@ import React, {
 } from 'react';
 import {
     Text,
-    View
+    View,
+    Linking
 } from 'react-native';
 
 export default class Playlist extends Component {
@@ -15,31 +16,20 @@ export default class Playlist extends Component {
         super(props);
         this.state = {
             access_token: this.props.navigation.getParam('access_token'),
+            url: `https://api.spotify.com/v1/me/player/devices?access_token=`
         }
     }
 
-    handleToken = async() => {
-        const response = await fetch('https://api.spotify.com/v1/me/player/devices', {
-            method: 'GET',
-            headers: {
-                Authorization: `Basic ` + this.state.auth,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: `grant_type=authorization_code&code=` + this.state.code + `&redirect_uri=music://spotify.development`
-        })
-        const json = await response.json();
-        await this.setState({
-            access_token: json.access_token,
-            refresh_token: json.refresh_token
-        })
-        console.log(json.access_token)
-        if (json.access_token) {
-            this.handleMe()
-        }
+    handleGetDevice = async() => {
+        // await Linking.openURL(this.state.url+this.state.access_token).then((url) => {
+        //     if (url) {
+        //         console.warn(url)
+        //     }
+        // }).catch(err => console.log(err));
     }
 
     componentDidMount() {
-        this.handleAuthorize();
+        this.handleGetDevice();
     }
 
     render() {
